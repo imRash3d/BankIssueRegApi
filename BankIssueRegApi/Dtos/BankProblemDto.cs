@@ -1,17 +1,20 @@
-﻿using System;
+﻿using BankIssueRegApi.Entities;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace BankIssueRegApi.Entities
+namespace BankIssueRegApi.Dtos
 {
-    public class BankProblem
+    public class BankProblemDto
     {
-        public int Id { get; set; }
+     
         public string Title { get; set; }
         public string Text { get; set; }
-        public int DepartmentId { get; set; }
-        public string DepartmentCode { get; set; }
+        public Department Department { get; set; }
+      
+        public List<string> Tags { get; set; }
+        public List<string> DepartmentCode { get; set; }
         public string Comments { get; set; }
         public string ProblemLeadName { get; set; }
         public string ProblemLeadEmail { get; set; }
@@ -19,14 +22,10 @@ namespace BankIssueRegApi.Entities
         public string ExternalLink { get; set; }
         public bool IsAnlysisRequired { get; set; }
         public DateTime CreatedDate { get; set; } = DateTime.Now;
-        public int Claim { get; set; }
-        public string Tags { get; set; }
-        public string Agents { get; set; }
-        public int Insurance { get; set; }
-        public DateTime ToWhen { get; set; }
-        public DateTime FromWhen { get; set; }
-        // public string FileUrl { get; set; }
-
-
+        public IssueDto Claim { get; set; }
+        public IssueDto Insurance { get; set; }
+        public int Id { get; set; }
+        public List<Agent> Agents { get; set; }
+        
     }
 }
