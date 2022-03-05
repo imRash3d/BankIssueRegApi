@@ -91,9 +91,28 @@ namespace BankIssueRegApi.Infrastructure.Services
             return model;
         }
 
-        public void DeleteProblem(BankProblem model)
+        public async Task<bool> DeleteProblem(int  id)
         {
-            _context.Remove(model);
+            var problem = _context.BankProblems.SingleOrDefault(x => x.Id == id);
+            var claim = _context.Issues.SingleOrDefault(x => x.Id == problem.Claim);
+            var insurance = _context.Issues.SingleOrDefault(x => x.Id == problem.Claim);
+            if (problem != null){
+                _context.BankProblems.Remove(problem);
+            }
+
+            if (claim != null)
+            {
+                _context.Issues.Remove(claim);
+            }
+
+            if (insurance != null)
+            {
+                _context.Issues.Remove(insurance);
+            }
+
+            return await SaveAllAsync();
+
+         
         }
 
         public BankProblem GetProblem(int productId)

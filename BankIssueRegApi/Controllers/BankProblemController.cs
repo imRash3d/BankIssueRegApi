@@ -74,7 +74,27 @@ namespace BankIssueRegApi.Controllers
             return await Task.FromResult(response);
         }
 
-    
+        [HttpPost("delete/{id}")]
+        public async Task<ActionResult<CommandResponse>> deleteProblem(int id)
+        {
+            CommandResponse response = new CommandResponse();
+
+           var isDeleted=  await _bankProblemService.DeleteProblem(id);
+            if (isDeleted)
+            {
+                response.Success = true;
+            }
+            else
+            {
+                response.Success = false;
+                response.ErrorMessage = "Failed to delete problem";
+                return BadRequest(response);
+            }
+
+            return await Task.FromResult(response);
+        }
+
+
 
     }
 }
