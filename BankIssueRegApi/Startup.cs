@@ -30,7 +30,7 @@ namespace BankIssueRegApi
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddApplicationServices(_configuration);
-            services.AddDbContext<DbContextService>(options => options.UseMySQL(_configuration.GetConnectionString("DefaultConnection")));
+            services.AddDbContext<DbContextService>(options => options.UseSqlServer(_configuration.GetConnectionString("DefaultConnection")));
             services.AddControllers();
             services.AddMvc().AddJsonOptions(o =>
             {

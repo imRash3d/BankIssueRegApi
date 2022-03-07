@@ -26,6 +26,10 @@ namespace BankIssueRegApi.Dtos
         public IssueDto Insurance { get; set; }
         public int Id { get; set; }
         public List<Agent> Agents { get; set; }
-        
+        public DateTime ToWhen { get; set; }
+        public DateTime FromWhen { get; set; }
+        public bool IsApproved { get; set; }
+        public string FileName { get; set; }
+
     }
 }

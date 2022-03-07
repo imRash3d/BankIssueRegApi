@@ -44,5 +44,7 @@ namespace BankIssueRegApi.Dtos
         public DateTime ToWhen { get; set; }
         [Required]
         public DateTime FromWhen { get; set; }
+        [Required]
+        public string FileName { get; set; }
     }
 }

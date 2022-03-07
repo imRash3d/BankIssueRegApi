@@ -15,21 +15,42 @@ namespace BankIssueRegApi.Infrastructure.Services
     {
         private readonly DbContextService _context;
         private readonly IMapper _mapper;
-        
+        private readonly IMailService _mailService;
 
 
-        public BankProblemService(DbContextService context, IMapper mapper)
+        public BankProblemService(DbContextService context, IMapper mapper, IMailService mailService)
         {
             _context = context;
             _mapper = mapper;
+            _mailService = mailService;
 
         }
-        public void AddProblem(CreateProblemDto model)
+        public async Task<bool> AddProblem(CreateProblemDto model)
 
         {
 
          BankProblem bankProblemModel = CreateProblemModel(model);
+        
          _context.BankProblems.Add(bankProblemModel);
+          SendMailToProblemLead(bankProblemModel);
+          return await SaveAllAsync();
+        }
+
+
+
+        private void SendMailToProblemLead(BankProblem model)
+        {
+            var dateContext = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+            dateContext.Add("IssueName", model.Title);
+
+            EmailModelDto emailModel = new EmailModelDto
+            {
+                EmailTemplateName = "ApprovalConfirm",
+                To = model.ProblemLeadEmail,
+                DataContext = dateContext
+            };
+
+            _mailService.SendMail(emailModel);
         }
 
 
@@ -38,9 +59,9 @@ namespace BankIssueRegApi.Infrastructure.Services
             // create claim & insureance 
 
             var ClaimModel = CreateIssueModel(model.Claim);
-            Issue claim = ClaimModel != null ? CreateIssue(ClaimModel) : null;
+           Issue claim = ClaimModel != null ? CreateIssue(ClaimModel) : null;
 
-            var insuranceModel = CreateIssueModel(model.Insurance);
+              var insuranceModel = CreateIssueModel(model.Insurance);
             Issue insurance = insuranceModel != null ? CreateIssue(insuranceModel) : null;
 
 
@@ -53,6 +74,7 @@ namespace BankIssueRegApi.Infrastructure.Services
                 Site = model.Site,
                 DepartmentId = model.Department.Id,
                 ExternalLink = model.ExternalLink,
+                FileName = model.FileName,
                 ProblemLeadName = model.ProblemLeadName,
                 ProblemLeadEmail = model.ProblemLeadEmail,
                 DepartmentCode = JsonConvert.SerializeObject(model.DepartmentCode),
@@ -115,31 +137,52 @@ namespace BankIssueRegApi.Infrastructure.Services
          
         }
 
-        public BankProblem GetProblem(int productId)
+        public BankProblemDto GetProblem(int id)
         {
-            throw new NotImplementedException();
+            var result = new BankProblemDto();
+            var bankProblem = _context.BankProblems.SingleOrDefault(x => x.Id == id);
+            if (bankProblem != null)
+            {
+                List<BankProblemDto> results = GetProblemsDto(new List<BankProblem> { bankProblem });
+                result = results.Find(x => x.Id == id);
+                return result;
+            }
+            else
+            {
+                return null;
+            }
+            
+            
         }
 
         public async Task<List<BankProblemDto>> GetProblems()
         {
             var bankProblems = await _context.BankProblems.ToListAsync();
-          
 
+
+            List<BankProblemDto> results = GetProblemsDto(bankProblems);
+            return results;
+        }
+
+
+
+        private List<BankProblemDto> GetProblemsDto(List<BankProblem> problems)
+        {
             List<BankProblemDto> results = new List<BankProblemDto>();
 
-            foreach (var problem in bankProblems)
+            foreach (var problem in problems)
             {
                 var problemDto = _mapper.Map<BankProblemDto>(problem);
                 var department = _context.Departments.SingleOrDefault(x => x.Id == problem.DepartmentId);
                 problemDto.Department = department;
-                var ids  = JsonConvert.DeserializeObject(problem.Agents);
+                var ids = JsonConvert.DeserializeObject(problem.Agents);
                 problemDto.Claim = CreateIssueDto(problem.Claim);
                 problemDto.Insurance = CreateIssueDto(problem.Insurance);
                 problemDto.Agents = getAgents(ids);
                 results.Add(problemDto);
             }
-           
-          
+
+            results.Sort((a, b) => b.CreatedDate.CompareTo(a.CreatedDate));
             return results;
         }
 
@@ -170,10 +213,64 @@ namespace BankIssueRegApi.Infrastructure.Services
             return await _context.SaveChangesAsync() > 0;
         }
 
-        public void UpdateProblem(dynamic model)
+        public void UpdateProblem(CreateProblemDto model)
         {
-            BankProblem bankProblemModel = CreateProblemModel(model);
-            _context.BankProblems.Update(model);
+            // BankProblem bankProblemModel = CreateProblemModel(model);
+
+            var problem = new BankProblem
+            {
+                Id = model.Id,
+                Title = model.Title,
+                Comments = model.Comments,
+                Text = model.Text,
+                Site = model.Site,
+                DepartmentId = model.Department.Id,
+                ExternalLink = model.ExternalLink,
+                ProblemLeadName = model.ProblemLeadName,
+                ProblemLeadEmail = model.ProblemLeadEmail,
+                DepartmentCode = JsonConvert.SerializeObject(model.DepartmentCode),
+                Tags = JsonConvert.SerializeObject(model.Tags),
+
+                Agents = JsonConvert.SerializeObject(model.Agents.Select(x => x.Id).ToList()),
+                 Claim = model.Claim!=null ? model.Claim.Id : 0,
+                 Insurance = model.Insurance != null ? model.Insurance.Id : 0,
+                ToWhen = model.ToWhen,
+                FromWhen = model.FromWhen,
+                IsAnlysisRequired = model.IsAnlysisRequired
+            };
+
+            if (model.Claim != null)
+            {
+                UpdateIssue(model.Claim);
+            }
+            if (model.Insurance != null)
+            {
+                UpdateIssue(model.Insurance);
+            }
+
+            _context.BankProblems.Update(problem);
+        }
+
+
+        private void UpdateIssue(IssueDto model)
+        {
+            var issue = new Issue
+            {
+                Category = JsonConvert.SerializeObject(model.Category),
+                Code = model.Code,
+                Family = model.Family,
+                FamilyDivision = model.FamilyDivision,
+                Id = model.Id
+            };
+            _context.Issues.Update(issue);
+        }
+
+        public async Task<bool> ApprovedProblem(ApprovedProblemDto model)
+        {
+            var bankProblem = _context.BankProblems.SingleOrDefault(x => x.Id == model.Id);
+           // bankProblem.IsApproved = model.IsApproved;
+            _context.BankProblems.Update(bankProblem);
+            return await SaveAllAsync();
         }
     }
 }

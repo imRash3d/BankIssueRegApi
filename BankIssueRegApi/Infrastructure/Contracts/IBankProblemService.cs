@@ -9,11 +9,13 @@ namespace BankIssueRegApi.Infrastructure.Contracts
 {
    public interface IBankProblemService
     {
-        void AddProblem(CreateProblemDto model);
+        Task<bool> AddProblem(CreateProblemDto model);
         Task<bool> SaveAllAsync();
-        void UpdateProblem(dynamic model);
+        void UpdateProblem(CreateProblemDto model);
         Task<bool> DeleteProblem(int id);
-        BankProblem GetProblem(int productId);
+        BankProblemDto GetProblem(int productId);
         Task<List<BankProblemDto>> GetProblems();
+
+        Task<bool> ApprovedProblem(ApprovedProblemDto model);
     }
 }

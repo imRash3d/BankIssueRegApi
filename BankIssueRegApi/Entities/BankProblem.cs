@@ -26,6 +26,8 @@ namespace BankIssueRegApi.Entities
         public DateTime ToWhen { get; set; }
         public DateTime FromWhen { get; set; }
         // public string FileUrl { get; set; }
+        public bool IsApproved { get; set; } = false;
+        public string FileName { get; set; }
 
 
     }

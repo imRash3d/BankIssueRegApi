@@ -19,6 +19,7 @@ namespace BankIssueRegApi.Dtos
         public string ExternalLink { get; set; }
         public bool IsAnlysisRequired { get; set; }
         public DateTime CreatedDate { get; set; }
+ 
         public int Id { get; set; }
     }
 }

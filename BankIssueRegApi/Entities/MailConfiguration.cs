@@ -7,7 +7,7 @@ namespace BankIssueRegApi.Entities
 {
     public class MailConfiguration
     {
-        public int id { get; set; }
+        public int Id { get; set; }
         public string MailConfigurationId { get; set; }
         public string Host { get; set; }
         public string MailAccountPassword { get; set; }
