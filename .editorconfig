@@ -1,0 +1,4 @@
+﻿[*.cs]
+
+# CS8898: Static types cannot be used as return types
+dotnet_diagnostic.CS8898.severity = none

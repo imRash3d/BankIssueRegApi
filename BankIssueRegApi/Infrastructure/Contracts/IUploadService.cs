@@ -10,5 +10,6 @@ namespace BankIssueRegApi.Infrastructure.Contracts
     public interface IUploadService
     {
         FileDto UploadFile(IFormFile file);
+        string FilePath(string fileName);
     }
 }

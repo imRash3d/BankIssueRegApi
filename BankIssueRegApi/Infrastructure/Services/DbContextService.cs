@@ -13,6 +13,7 @@ namespace BankIssueRegApi.Infrastructure.Services
         public DbSet<MailConfiguration> MailConfigurations { get; set; }
         public DbSet<EmailTemplate> EmailTemplates { get; set; }
         public DbSet<Department> Departments { get; set; }
+        // public DbSet<UploadFile> Files { get; set; }
         public DbSet<Agent> Agents { get; set; }
         public DbSet<Issue> Issues { get; set; }
 
@@ -31,6 +32,7 @@ namespace BankIssueRegApi.Infrastructure.Services
             modelBuilder.Entity<BankProblem>().ToTable("problems");
             modelBuilder.Entity<Department>().ToTable("departments");
             modelBuilder.Entity<Agent>().ToTable("agents");
+            // modelBuilder.Entity<UploadFile>().ToTable("files");
             modelBuilder.Entity<Issue>().ToTable("problem_related_to");
             modelBuilder.Entity<MailConfiguration>().ToTable("mailconfigurations");
             modelBuilder.Entity<EmailTemplate>().ToTable("email_templates");

@@ -3,7 +3,12 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.30804.86
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BankIssueRegApi", "BankIssueRegApi\BankIssueRegApi.csproj", "{9BD83401-0E7B-47FD-87F3-59AD2CF5229B}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BankIssueRegApi", "BankIssueRegApi\BankIssueRegApi.csproj", "{9BD83401-0E7B-47FD-87F3-59AD2CF5229B}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{2C39FC13-1462-443B-89FB-7233460CE31A}"
+	ProjectSection(SolutionItems) = preProject
+		.editorconfig = .editorconfig
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -45,6 +46,32 @@ namespace BankIssueRegApi.Controllers
             return await Task.FromResult(response);
         }
 
+        [HttpGet("{filename}")]
+        public async Task<IActionResult> Download(string fileName)
+        {
+            CommandResponse response = new CommandResponse();
+            if (fileName == null)
+            {
+                response.ErrorMessage = "Failed to uplaod File";
+                return BadRequest(response);
+            }
+            //Build the File Path.
+
+
+            string path = _uploadService.FilePath(fileName);
+
+
+            //Read the File data into Byte Array.
+            byte[] bytes = System.IO.File.ReadAllBytes(path);
+
+            //Send the File to Download.
+            return File(bytes, "application/octet-stream", fileName);
+
+           
+        }
+
+
+    
 
     }
 }
