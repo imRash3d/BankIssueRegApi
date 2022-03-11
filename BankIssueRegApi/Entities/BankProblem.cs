@@ -28,7 +28,6 @@ namespace BankIssueRegApi.Entities
         // public string FileUrl { get; set; }
         public bool IsApproved { get; set; } = false;
         public string FileName { get; set; }
-
-
+        public string Files { get; set; }
     }
 }

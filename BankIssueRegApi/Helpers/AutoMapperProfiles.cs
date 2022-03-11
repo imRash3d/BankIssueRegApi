@@ -19,7 +19,8 @@ namespace BankIssueRegApi.Helpers
                 .ForMember(y => y.DepartmentCode, option => option.MapFrom(x => JsonConvert.DeserializeObject(x.DepartmentCode)))
                 .ForMember(y => y.Claim, option => option.Ignore())
                 .ForMember(y => y.Insurance, option => option.Ignore())
-                .ForMember(y => y.Agents, option => option.MapFrom(x => JsonConvert.DeserializeObject(x.Agents)));
+                .ForMember(y => y.Agents, option => option.MapFrom(x => JsonConvert.DeserializeObject(x.Agents)))
+                .ForMember(y => y.Files, option => option.MapFrom(x => JsonConvert.DeserializeObject(x.Files)));
 
             CreateMap<Issue, IssueDto>()
                  .ForMember(y => y.Category, option => option.MapFrom(x => JsonConvert.DeserializeObject(x.Category)));
