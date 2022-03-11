@@ -268,7 +268,7 @@ namespace BankIssueRegApi.Infrastructure.Services
         public async Task<bool> ApprovedProblem(ApprovedProblemDto model)
         {
             var bankProblem = _context.BankProblems.SingleOrDefault(x => x.Id == model.Id);
-           // bankProblem.IsApproved = model.IsApproved;
+             bankProblem.IsApproved = model.IsApproved;
             _context.BankProblems.Update(bankProblem);
             return await SaveAllAsync();
         }
