@@ -29,7 +29,7 @@ namespace BankIssueRegApi.Dtos
         public DateTime ToWhen { get; set; }
         public DateTime FromWhen { get; set; }
         public bool IsApproved { get; set; }
-        public string FileName { get; set; }
-
+        //  public string FileName { get; set; }  // not used anymore
+        public List<FileDto> Files { get; set; }
     }
 }

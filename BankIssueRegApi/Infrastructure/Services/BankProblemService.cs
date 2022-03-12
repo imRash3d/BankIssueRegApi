@@ -79,7 +79,7 @@ namespace BankIssueRegApi.Infrastructure.Services
                 ProblemLeadEmail = model.ProblemLeadEmail,
                 DepartmentCode = JsonConvert.SerializeObject(model.DepartmentCode),
                 Tags = JsonConvert.SerializeObject(model.Tags),
-
+                Files= JsonConvert.SerializeObject(model.Files),
                 Agents = JsonConvert.SerializeObject(model.Agents.Select(x => x.Id).ToList()),
                 Claim = claim != null ? claim.Id : 0,
                 Insurance = insurance != null ? insurance.Id : 0,
@@ -230,7 +230,7 @@ namespace BankIssueRegApi.Infrastructure.Services
                 ProblemLeadEmail = model.ProblemLeadEmail,
                 DepartmentCode = JsonConvert.SerializeObject(model.DepartmentCode),
                 Tags = JsonConvert.SerializeObject(model.Tags),
-
+                Files = JsonConvert.SerializeObject(model.Files),
                 Agents = JsonConvert.SerializeObject(model.Agents.Select(x => x.Id).ToList()),
                  Claim = model.Claim!=null ? model.Claim.Id : 0,
                  Insurance = model.Insurance != null ? model.Insurance.Id : 0,
