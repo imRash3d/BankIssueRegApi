@@ -62,7 +62,7 @@ namespace BankIssueRegApi.Controllers
 
 
             //Read the File data into Byte Array.
-            byte[] bytes = System.IO.File.ReadAllBytes(path);
+            byte[] bytes =  System.IO.File.ReadAllBytes(path);
 
             //Send the File to Download.
             return File(bytes, "application/octet-stream", fileName);

@@ -32,13 +32,15 @@ namespace BankIssueRegApi.Infrastructure.Services
          BankProblem bankProblemModel = CreateProblemModel(model);
         
          _context.BankProblems.Add(bankProblemModel);
-          SendMailToProblemLead(bankProblemModel);
+            SendMailToProblemLead(bankProblemModel);
           return await SaveAllAsync();
         }
 
 
 
-        private void SendMailToProblemLead(BankProblem model)
+
+
+        private void SendMailToProblemLead(dynamic model)
         {
             var dateContext = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
             dateContext.Add("IssueName", model.Title);
@@ -91,6 +93,41 @@ namespace BankIssueRegApi.Infrastructure.Services
 
             return bankProblemModel;
         }
+
+
+        private ProblemPhase CreateProblemPhaseModel(CreateProblePhasemDto model)
+        {
+            // create claim & insureance 
+
+            var ClaimModel = CreateIssueModel(model.Claim);
+            Issue claim = ClaimModel != null ? CreateIssue(ClaimModel) : null;
+
+            var insuranceModel = CreateIssueModel(model.Insurance);
+            Issue insurance = insuranceModel != null ? CreateIssue(insuranceModel) : null;
+
+
+
+            ProblemPhase bankProblemModel = new ProblemPhase
+            {
+                Title = model.Title,
+                ProblemId= model.ProblemId,
+                DepartmentId = model.Department.Id,
+                ProblemLeadName = model.ProblemLeadName,
+                ProblemLeadEmail = model.ProblemLeadEmail,
+                DepartmentCode = JsonConvert.SerializeObject(model.DepartmentCode),
+                Tags = JsonConvert.SerializeObject(model.Tags),
+                Files = JsonConvert.SerializeObject(model.Files),
+                Agents = JsonConvert.SerializeObject(model.Agents.Select(x => x.Id).ToList()),
+                Claim = claim != null ? claim.Id : 0,
+                Insurance = insurance != null ? insurance.Id : 0,
+                BusinessImpact = model.BusinessImpact,
+              
+                
+            };
+
+            return bankProblemModel;
+        }
+
 
         private Issue CreateIssueModel(IssueDto model)
         {
@@ -272,5 +309,158 @@ namespace BankIssueRegApi.Infrastructure.Services
             _context.BankProblems.Update(bankProblem);
             return await SaveAllAsync();
         }
+
+        public async Task<bool> AddProblemPhase(CreateProblePhasemDto model)
+        {
+
+             ProblemPhase problemPhaseModel = CreateProblemPhaseModel(model);
+
+              _context.ProblemPhases.Add(problemPhaseModel);
+               await SaveAllAsync();
+               AddStakeholders(model, problemPhaseModel.Id);
+               return await SaveAllAsync();
+        }
+
+
+        private void AddStakeholders(CreateProblePhasemDto model, int phaseId)
+        {
+            foreach (var stakeholder in model.Stakeholders)
+            {
+                var stakeholderModel = new Stakeholder
+                {
+                    Department = stakeholder.Department,
+                    Name = stakeholder.Name,
+                    Email = stakeholder.Email,
+                    PhaseId = phaseId
+                };
+
+                _context.Stakeholders.Add(stakeholderModel);
+
+
+                //  SendMailToProblemLead(bankProblemModel);
+
+            };
+
+           
+        }
+
+        public ProblemPhaseDto GetPhase(int problemId)
+        {
+            var result = new ProblemPhaseDto();
+            var phase = _context.ProblemPhases.SingleOrDefault(x => x.ProblemId == problemId);
+            if (phase != null)
+            {
+                result = _mapper.Map<ProblemPhaseDto>(phase);
+                var department = _context.Departments.SingleOrDefault(x => x.Id == phase.DepartmentId);
+                result.Department = department;
+                var ids = JsonConvert.DeserializeObject(phase.Agents);
+                result.Claim = CreateIssueDto(phase.Claim);
+                result.Insurance = CreateIssueDto(phase.Insurance);
+                result.Agents = getAgents(ids);
+                result.Stakeholders = _context.Stakeholders.Where(x => x.PhaseId == phase.Id).ToList();
+                return result;
+            }
+            else
+            {
+                return null;
+            }
+
+        }
+
+        public async Task<bool> UpdateProblemPhase(CreateProblePhasemDto model)
+        {
+            // BankProblem bankProblemModel = CreateProblemModel(model);
+
+            var phase = new ProblemPhase
+            {
+                ProblemId= model.ProblemId,
+                Id = model.Id,
+                Title = model.Title,
+                BusinessImpact = model.BusinessImpact,
+                ProblemLeadName = model.ProblemLeadName,
+                ProblemLeadEmail = model.ProblemLeadEmail,
+                DepartmentCode = JsonConvert.SerializeObject(model.DepartmentCode),
+                Tags = JsonConvert.SerializeObject(model.Tags),
+                Files = JsonConvert.SerializeObject(model.Files),
+                Agents = JsonConvert.SerializeObject(model.Agents.Select(x => x.Id).ToList()),
+                Claim = model.Claim != null ? model.Claim.Id : 0,
+                Insurance = model.Insurance != null ? model.Insurance.Id : 0,
+            };
+
+            if (model.Claim != null)
+            {
+                UpdateIssue(model.Claim);
+            }
+            if (model.Insurance != null)
+            {
+                UpdateIssue(model.Insurance);
+            }
+
+            if (model.Stakeholders != null)
+            {
+                UpdateStakeholders(model.Stakeholders, phase.Id,phase);
+            }
+
+            _context.ProblemPhases.Update(phase);
+            return await SaveAllAsync();
+        }
+
+
+        private void UpdateStakeholders(ICollection<Stakeholder> stakeholders, int phaseId, ProblemPhase phase)
+        {
+            foreach (var stakeholder in stakeholders)
+            {
+                if (stakeholder.Id>0)
+                {
+                    var updateModel = new Stakeholder
+                    {
+                        Department = stakeholder.Department,
+                        Name = stakeholder.Name,
+                        Email = stakeholder.Email,
+                        PhaseId = phaseId,
+                        Id= stakeholder.Id
+                    };
+                    _context.Stakeholders.Update(updateModel);
+
+                }else
+                {
+                    var stakeholderModel = new Stakeholder
+                    {
+                        Department = stakeholder.Department,
+                        Name = stakeholder.Name,
+                        Email = stakeholder.Email,
+                        PhaseId = phaseId
+                    };
+
+                    _context.Stakeholders.Add(stakeholderModel);
+                    SendMailStakeholderModel(phase, stakeholder.Email);
+                }
+
+
+
+       
+
+            };
+
+
+        }
+
+
+        private void SendMailStakeholderModel(dynamic model, string personEmail)
+        {
+            var dateContext = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+            dateContext.Add("IssueName", model.Title);
+
+            EmailModelDto emailModel = new EmailModelDto
+            {
+                EmailTemplateName = "ApprovalConfirm",
+                To = personEmail,
+                DataContext = dateContext
+            };
+
+            _mailService.SendMail(emailModel);
+        }
+
+
     }
 }

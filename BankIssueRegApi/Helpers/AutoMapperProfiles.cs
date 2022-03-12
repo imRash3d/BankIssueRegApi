@@ -26,6 +26,15 @@ namespace BankIssueRegApi.Helpers
                  .ForMember(y => y.Category, option => option.MapFrom(x => JsonConvert.DeserializeObject(x.Category)));
 
 
+
+            CreateMap<ProblemPhase, ProblemPhaseDto>()
+
+               .ForMember(y => y.Tags, option => option.MapFrom(x => JsonConvert.DeserializeObject(x.Tags)))
+               .ForMember(y => y.DepartmentCode, option => option.MapFrom(x => JsonConvert.DeserializeObject(x.DepartmentCode)))
+               .ForMember(y => y.Claim, option => option.Ignore())
+               .ForMember(y => y.Insurance, option => option.Ignore())
+               .ForMember(y => y.Agents, option => option.MapFrom(x => JsonConvert.DeserializeObject(x.Agents)))
+               .ForMember(y => y.Files, option => option.MapFrom(x => JsonConvert.DeserializeObject(x.Files)));
         }
 
         private IssueDto returnIssue(string _issue)

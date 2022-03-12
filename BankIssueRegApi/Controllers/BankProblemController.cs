@@ -100,6 +100,29 @@ namespace BankIssueRegApi.Controllers
 
             return await Task.FromResult(response);
         }
+
+
+        [HttpPost("add-phase")]
+        public async Task<ActionResult<CommandResponse>> addProblemPhase(CreateProblePhasemDto model)
+        {
+            CommandResponse response = new CommandResponse();
+
+            var result = await _bankProblemService.AddProblemPhase(model);
+            if (result)
+            {
+                response.Success = true;
+            }
+            else
+            {
+                response.Success = false;
+                response.ErrorMessage = "Failed to add problem";
+                return BadRequest(response);
+            }
+
+            return await Task.FromResult(response);
+        }
+
+
         [HttpPost("update/{id}")]
         public async Task<ActionResult<CommandResponse>> updateProblem(CreateProblemDto model)
         {
@@ -163,6 +186,54 @@ namespace BankIssueRegApi.Controllers
         }
 
 
+
+        // get phase 
+        [HttpGet("phase/{id}")] //problem id
+        public async Task<ActionResult<CommandResponse>> GetPhase(int id)
+
+        {
+
+            CommandResponse response = new CommandResponse();
+
+            try
+            {
+                var phase = _bankProblemService.GetPhase(id);
+
+                response.Result = phase;
+                response.Success = true;
+            }
+            catch (Exception ex)
+            {
+
+
+                response.Result = null;
+                response.Success = false;
+                response.ErrorMessage = JsonConvert.SerializeObject(ex);
+            }
+            return await Task.FromResult(response);
+        }
+
+
+
+        [HttpPost("update-phase/{id}")]
+        public async Task<ActionResult<CommandResponse>> updatePhase(CreateProblePhasemDto model)
+        {
+            CommandResponse response = new CommandResponse();
+
+          
+            if (await _bankProblemService.UpdateProblemPhase(model))
+            {
+                response.Success = true;
+            }
+            else
+            {
+                response.Success = false;
+                response.ErrorMessage = "Failed to add problem";
+                return BadRequest(response);
+            }
+
+            return await Task.FromResult(response);
+        }
 
     }
 }
