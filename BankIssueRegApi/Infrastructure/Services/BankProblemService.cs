@@ -30,12 +30,12 @@ namespace BankIssueRegApi.Infrastructure.Services
 
         {
 
-         BankProblem bankProblemModel = CreateProblemModel(model);
-        
-         _context.BankProblems.Add(bankProblemModel);
+            BankProblem bankProblemModel = CreateProblemModel(model);
+
+            _context.BankProblems.Add(bankProblemModel);
             await SaveAllAsync();
             SendMailToProblemLead(bankProblemModel);
-          return await SaveAllAsync();
+            return true;
         }
 
 
