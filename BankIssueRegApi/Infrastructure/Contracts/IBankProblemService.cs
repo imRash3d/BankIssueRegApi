@@ -21,5 +21,7 @@ namespace BankIssueRegApi.Infrastructure.Contracts
         Task<bool> ApprovedProblem(ApprovedProblemDto model);
 
         Task<bool> UpdateProblemPhase(CreateProblePhasemDto model);
+
+        void TestMail();
     }
 }

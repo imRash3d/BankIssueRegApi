@@ -31,10 +31,10 @@ namespace BankIssueRegApi.Infrastructure.Services
         {
             MailConfiguration mailConfiguration = _context.MailConfigurations.SingleOrDefault(x => x.MailConfigurationId == _configuration["MailConfigurationId"]);
 
-            EmailTemplate emailTemplate = _context.EmailTemplates.SingleOrDefault(x => x.TemplateName == emailDataDto.EmailTemplateName);
+           // EmailTemplate emailTemplate = _context.EmailTemplates.SingleOrDefault(x => x.TemplateName == emailDataDto.EmailTemplateName);
 
 
-            if (emailDataDto != null && mailConfiguration != null && emailTemplate != null)
+            if (emailDataDto != null && mailConfiguration != null)
             {
                 string to = emailDataDto.To; //To address    
                 string from = mailConfiguration.MailSenderAddress; //From address    
@@ -43,19 +43,24 @@ namespace BankIssueRegApi.Infrastructure.Services
                 {
                     IncludeFields = true,
                 };
-                string mailbody = Regex.Unescape(emailTemplate.TemplateBody);      // unescape  Mailtemaplate 
+
+                string templateBody = System.IO.File.ReadAllText("./EmailTemplates/approval.html");
+                string mailbody = Regex.Unescape(templateBody);      // unescape  Mailtemaplate 
 
 
 
                 // formate Mailtemaplate with place holder 
 
                 Regex re = new Regex(@"\{(\w+)\}", RegexOptions.Compiled);
-              //  string outputMailBody = re.Format(mailbody, emailDataDto.DataContext);
+                emailDataDto.DataContext["Link"] = _configuration["ApprovedUrl"] + emailDataDto.DataContext["IssueId"];
+                string outputMailBody = re.Format(mailbody, emailDataDto.DataContext);
 
 
 
-                message.Subject = emailTemplate.TemplateSubject;
-                message.Body = "<html><body><div>You have been invited to approve "+emailDataDto.DataContext["IssueName"] +" this problem</div></body></html>";
+                message.Subject = "Approval Email";
+
+                message.Body = outputMailBody;
+                //message.Body = "<html><body><div>You have been invited to approve "+emailDataDto.DataContext["IssueName"] +" this problem</div></body></html>";
                 message.BodyEncoding = Encoding.UTF8;
                 message.IsBodyHtml = true;
                 SmtpClient client = new SmtpClient(mailConfiguration.Host, mailConfiguration.Port); //Gmail smtp    

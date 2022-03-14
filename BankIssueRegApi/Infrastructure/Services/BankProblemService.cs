@@ -6,6 +6,7 @@ using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -32,6 +33,7 @@ namespace BankIssueRegApi.Infrastructure.Services
          BankProblem bankProblemModel = CreateProblemModel(model);
         
          _context.BankProblems.Add(bankProblemModel);
+            await SaveAllAsync();
             SendMailToProblemLead(bankProblemModel);
           return await SaveAllAsync();
         }
@@ -40,10 +42,16 @@ namespace BankIssueRegApi.Infrastructure.Services
 
 
 
-        private void SendMailToProblemLead(dynamic model)
+        private void SendMailToProblemLead(BankProblem model)
         {
             var dateContext = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
-            dateContext.Add("IssueName", model.Title);
+            dateContext.Add("Title", model.Title);
+            dateContext.Add("DisplayName", model.ProblemLeadName);
+            dateContext.Add("Tags", String.Join(",", model.Tags));
+            dateContext.Add("DepartmentCode", model.DepartmentCode);
+            dateContext.Add("FromWhen", model.FromWhen.ToString("MM/dd/yyyy"));
+            dateContext.Add("FromTo", model.ToWhen.ToString("MM/dd/yyyy"));
+            dateContext.Add("IssueId", model.Id+""); 
 
             EmailModelDto emailModel = new EmailModelDto
             {
@@ -446,10 +454,17 @@ namespace BankIssueRegApi.Infrastructure.Services
         }
 
 
-        private void SendMailStakeholderModel(dynamic model, string personEmail)
+        private void SendMailStakeholderModel(ProblemPhase model, string personEmail)
         {
+           
             var dateContext = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
-            dateContext.Add("IssueName", model.Title);
+            dateContext.Add("Title", model.Title);
+            dateContext.Add("DisplayName", model.ProblemLeadName);
+            dateContext.Add("Tags", String.Join(",", model.Tags));
+            dateContext.Add("DepartmentCode", model.DepartmentCode);
+            dateContext.Add("FromWhen", DateTime.Parse("").ToString("MM/dd/yyyy"));
+            dateContext.Add("FromTo", DateTime.Parse("").ToString("MM/dd/yyyy"));
+            dateContext.Add("IssueId", model.ProblemId + "");
 
             EmailModelDto emailModel = new EmailModelDto
             {
@@ -461,6 +476,25 @@ namespace BankIssueRegApi.Infrastructure.Services
             _mailService.SendMail(emailModel);
         }
 
+        public void TestMail()
+        {
+            var dateContext = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+            dateContext.Add("Title", "test");
+            dateContext.Add("DisplayName", "Rishi");
+            dateContext.Add("Tags", "Claim");
+            dateContext.Add("DepartmentCode", "001");
+            dateContext.Add("FromWhen", "12");
+            var dt = DateTime.Parse("2022-03-19T06:00:00");
+            dateContext.Add("FromTo", dt.ToString("MM/dd/yyyy"));
+            dateContext.Add("IssueId", "12"); // test id 
+            EmailModelDto emailModel = new EmailModelDto
+            {
+                EmailTemplateName = "ApprovalConfirm",
+                To = "sampleuser05@yopmail.com",
+                DataContext = dateContext
+            };
 
+            _mailService.SendMail(emailModel);
+        }
     }
 }

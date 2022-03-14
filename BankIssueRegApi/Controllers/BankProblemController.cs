@@ -235,5 +235,31 @@ namespace BankIssueRegApi.Controllers
             return await Task.FromResult(response);
         }
 
+
+        [HttpGet("test-mail")] //problem id
+        public async Task<ActionResult<CommandResponse>> TestMail()
+
+        {
+
+            CommandResponse response = new CommandResponse();
+
+            try
+            {
+                _bankProblemService.TestMail();
+
+                response.Result = true;
+                response.Success = true;
+            }
+            catch (Exception ex)
+            {
+
+
+                response.Result = null;
+                response.Success = false;
+                response.ErrorMessage = JsonConvert.SerializeObject(ex);
+            }
+            return await Task.FromResult(response);
+        }
+
     }
 }
