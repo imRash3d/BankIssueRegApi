@@ -1,0 +1,184 @@
+START TRANSACTION;
+SET @time_zone = "+00:00";
+
+--
+-- Database: `bank_issue_reg`
+--
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `agents`
+--
+
+CREATE TABLE agents (
+  [Id] int NOT NULL,
+  [Key] varchar(255) NOT NULL,
+  [Value] varchar(255) NOT NULL,
+  [Name] varchar(255) NOT NULL
+) ;
+
+--
+-- Dumping data for table `agents`
+--
+
+INSERT INTO agents ([Id], [Key], [Value], [Name]) VALUES
+(1, 'front-office', 'Front Office', 'Jhon Doe'),
+(2, 'front-office', 'Front Office', 'Alison Morio'),
+(3, 'back-office', 'Back Office', 'Kevin William'),
+(4, 'back-office', 'Back Office', 'Kiara Morio'),
+(5, 'front-desk', 'Front Desk', 'Tiffan Ray'),
+(6, 'front-desk', 'Front Desk', 'Lea Jackson');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `departments`
+--
+
+CREATE TABLE departments (
+  [Id] int NOT NULL,
+  [Key] varchar(255) NOT NULL,
+  [Value] varchar(255) NOT NULL
+) ;
+
+--
+-- Dumping data for table `departments`
+--
+
+INSERT INTO departments ([Id], [Key], [Value]) VALUES
+(1, 'local', 'Local'),
+(2, 'national', 'National'),
+(3, 'international', 'International');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `problems`
+--
+
+CREATE TABLE problems (
+  [Id] int NOT NULL,
+  [Text] varchar(255) NOT NULL,
+  [Comments] varchar(max) NOT NULL,
+  [ProblemLeadName] varchar(255) NOT NULL,
+  [ProblemLeadEmail] varchar(255) NOT NULL,
+  [CreatedDate] datetime2(0) NOT NULL,
+  [DepartmentId] int NOT NULL,
+  [Site] varchar(255) NOT NULL,
+  [ExternalLink] varchar(255) DEFAULT NULL,
+  [IsAnlysisRequired] smallint NOT NULL,
+  [Title] varchar(255) NOT NULL,
+  [DepartmentCode] varchar(max) NOT NULL CHECK (ISJSON(DepartmentCode)>0),
+  [Claim] int DEFAULT NULL,
+  [Insurance] int DEFAULT NULL,
+  [Tags] varchar(max) NOT NULL CHECK (ISJSON(Tags)>0),
+  [Agents] varchar(max) NOT NULL CHECK (ISJSON(Agents)>0),
+  [FromWhen] datetime2(0) NOT NULL,
+  [ToWhen] datetime2(0) NOT NULL
+) ;
+
+--
+-- Dumping data for table `problems`
+--
+
+INSERT INTO problems ([Id], [Text], [Comments], [ProblemLeadName], [ProblemLeadEmail], [CreatedDate], [DepartmentId], [Site], [ExternalLink], [IsAnlysisRequired], [Title], [DepartmentCode], [Claim], [Insurance], [Tags], [Agents], [FromWhen], [ToWhen]) VALUES
+(19, 'dsfsdf', 'dsfsdf', 'dsfdsf', 'fdsfsdf@sdfdsf', '2022-03-05 13:18:34', 3, 'test', 'test', 0, 'dsfdsf', '["001 - Front Office"]', 5, 0, '["Claim"]', '[4,5,6]', '2022-03-17 18:00:00', '2022-03-20 18:00:00'),
+(20, 'dsfsdf', 'dsfsdf', 'dsfdsf', 'fdsfsdf@sdfdsf', '2022-03-05 13:52:19', 3, 'test', 'test', 0, 'dsfdsf', '["001 - Front Office"]', 6, 0, '["Claim"]', '[4,5,6]', '2022-03-17 18:00:00', '2022-03-20 18:00:00'),
+(21, 'dsfsdf', 'dsfsdf', 'dsfdsf', 'fdsfsdf@sdfdsf', '2022-03-05 13:56:43', 3, 'test', 'test', 0, 'dsfdsf', '["001 - Front Office"]', 0, 10, '["Claim"]', '[4,5,6]', '2022-03-17 18:00:00', '2022-03-20 18:00:00'),
+(22, 'ok', 'this is sample comments', 'test User', 'testuser@yopmail.com', '2022-03-05 16:04:54', 1, 'test', 'test', 0, 'Issue 3', '["101 - Front Desk","153 - Main Office"]', 11, 12, '["Claim","Insurance"]', '[1,2,3,4]', '2022-03-25 18:00:00', '2022-03-24 18:00:00');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `problem_related_to`
+--
+
+CREATE TABLE problem_related_to (
+  [Id] int NOT NULL,
+  [Code] varchar(255) NOT NULL,
+  [Category] varchar(255) NOT NULL,
+  [Family] varchar(255) NOT NULL,
+  [FamilyDivision] varchar(255) NOT NULL
+) ;
+
+--
+-- Dumping data for table `problem_related_to`
+--
+
+INSERT INTO problem_related_to ([Id], [Code], [Category], [Family], [FamilyDivision]) VALUES
+(1, 'dsfdsf', '{"ValueKind":2}', 'Local', 'Howrah, Park Street (Family Division) etc.'),
+(2, '', 'null', '', ''),
+(3, 'dsfdsf', '["House Loan"]', 'Local', 'Howrah, Park Street (Family Division) etc.'),
+(4, 'dsfdsf', '["House Loan"]', 'Local', 'Howrah, Park Street (Family Division) etc.'),
+(5, 'dsfdsf', '["House Loan"]', 'Local', 'Howrah, Park Street (Family Division) etc.'),
+(6, 'dsfdsf', '["House Loan"]', 'Local', 'Howrah, Park Street (Family Division) etc.'),
+(7, 'dsfdsf', '["House Loan"]', 'Local', 'Howrah, Park Street (Family Division) etc.'),
+(8, 'dsfdsf', '["House Loan"]', 'Local', 'Howrah, Park Street (Family Division) etc.'),
+(9, 'dsfdsf', '["House Loan"]', 'Local', 'Howrah, Park Street (Family Division) etc.'),
+(10, 'dsfdsf', '["House Loan"]', 'Local', 'Howrah, Park Street (Family Division) etc.'),
+(11, '001', '["House Loan","Car Loan"]', 'National', 'Howrah, Park Street (Family Division) etc.'),
+(12, '002', '["Car Loan","Personal Loan"]', 'Local', 'Howrah, Park Street (Family Division) etc.');
+
+--
+-- Indexes for dumped tables
+--
+
+--
+-- Indexes for table `agents`
+--
+ALTER TABLE agents
+  ADD PRIMARY KEY ([Id]);
+
+--
+-- Indexes for table `departments`
+ALTER TABLE departments
+  ADD PRIMARY KEY ([Id]);
+
+--
+-- SQLINES DEMO ***  `problems`
+--
+ALTER TABLE problems
+  ADD PRIMARY KEY ([Id]);
+
+--
+-- SQLINES DEMO ***  `problem_related_to`
+--
+ALTER TABLE problem_related_to
+  ADD PRIMARY KEY ([Id]);
+
+--
+-- AUTO_INCREMENT for dumped tables
+--
+
+--
+-- AUTO_INCREMENT for table `agents`
+-- [CANNOT RUN THE FOLLOWING]
+ALTER TABLE agents
+  ALTER COLUMN Id int NOT NULL;
+
+ALTER TABLE agents
+  ALTER COLUMN Id int auto_increment;
+
+--
+-- SQLINES DEMO *** r table `departments`
+-- [CANNOT RUN THE FOLLOWING]
+ALTER TABLE departments
+  ALTER COLUMN [Id] cast(11 as int) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+
+--
+-- SQLINES DEMO *** r table `problems`
+-- [CANNOT RUN THE FOLLOWING]
+ALTER TABLE problems
+  ALTER COLUMN [Id] cast(11 as int) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=23;
+
+--
+-- SQLINES DEMO *** r table `problem_related_to`
+-- [CANNOT RUN THE FOLLOWING]
+ALTER TABLE problem_related_to
+  ALTER COLUMN [Id] cast(11 as int) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=13;
+COMMIT;
+
+/*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
+/*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
+/*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;

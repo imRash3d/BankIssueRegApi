@@ -382,6 +382,7 @@ namespace BankIssueRegApi.Infrastructure.Services
             var phase = new ProblemPhase
             {
                 ProblemId= model.ProblemId,
+                DepartmentId = model.Department.Id,
                 Id = model.Id,
                 Title = model.Title,
                 BusinessImpact = model.BusinessImpact,
@@ -409,8 +410,26 @@ namespace BankIssueRegApi.Infrastructure.Services
                 UpdateStakeholders(model.Stakeholders, phase.Id,phase);
             }
 
+            if (model.DeleteStakeholderIds != null && model.DeleteStakeholderIds.Count>0)
+            {
+                DeleteStakeholders(model);
+            }
+
             _context.ProblemPhases.Update(phase);
             return await SaveAllAsync();
+        }
+
+        private void DeleteStakeholders(CreateProblePhasemDto model)
+        {
+            foreach(var id in model.DeleteStakeholderIds)
+            {
+                var stakeholder = _context.Stakeholders.SingleOrDefault(x => x.Id == id);
+                if (stakeholder != null)
+                {
+                    _context.Stakeholders.Remove(stakeholder);
+                }
+            }
+          
         }
 
 
@@ -462,8 +481,8 @@ namespace BankIssueRegApi.Infrastructure.Services
             dateContext.Add("DisplayName", model.ProblemLeadName);
             dateContext.Add("Tags", String.Join(",", model.Tags));
             dateContext.Add("DepartmentCode", model.DepartmentCode);
-            dateContext.Add("FromWhen", DateTime.Parse("").ToString("MM/dd/yyyy"));
-            dateContext.Add("FromTo", DateTime.Parse("").ToString("MM/dd/yyyy"));
+            dateContext.Add("FromWhen", "-");
+            dateContext.Add("FromTo", "-");
             dateContext.Add("IssueId", model.ProblemId + "");
 
             EmailModelDto emailModel = new EmailModelDto

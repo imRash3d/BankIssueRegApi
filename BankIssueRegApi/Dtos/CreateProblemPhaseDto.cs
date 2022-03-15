@@ -40,5 +40,7 @@ namespace BankIssueRegApi.Dtos
         public ICollection<Stakeholder> Stakeholders { get; set; }
         [Required]
         public string BusinessImpact { get; set; }
+
+        public List<int> DeleteStakeholderIds { get; set; }
     }
 }
